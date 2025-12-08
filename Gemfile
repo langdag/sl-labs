@@ -41,7 +41,7 @@ gem "image_processing", "~> 1.2"
 
 group :development, :test do
   gem "pry"
-  gem "dotenv", "~> 3.1", ">= 3.1.8"
+  gem "dotenv", "~> 3.2"
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
