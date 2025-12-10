@@ -1,3 +1,8 @@
+PATH
+  remote: ../git_object_store
+  specs:
+    git_object_store (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -405,6 +410,7 @@ DEPENDENCIES
   capybara
   debug
   dotenv (~> 3.1, >= 3.1.8)
+  git_object_store!
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
