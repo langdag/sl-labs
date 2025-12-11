@@ -1,4 +1,5 @@
 class Repository < ApplicationRecord
+  belongs_to :user
   validates :name, presence: true
 
   after_create_commit :initialize_git_repository
