@@ -3,9 +3,9 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
-    helper_method :current_user
   end
+
+  attr_reader :current_user
 
   class_methods do
     def allow_unauthenticated_access(**options)
@@ -21,8 +21,6 @@ module Authentication
     def require_authentication
       authenticate_request || render_unauthorized
     end
-
-    attr_reader :current_user
 
     def authenticate_request
       return unless request.headers['Authorization'].present?
