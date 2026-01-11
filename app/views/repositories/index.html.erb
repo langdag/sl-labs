@@ -1,0 +1,46 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Your Repositories</h1>
+    <%= link_to "New Repository", new_repository_path, class: "btn btn-primary" %>
+  </div>
+
+  <%= form_with url: repositories_path, method: :get, local: true, class: "search-sort" do |f| %>
+    <%= f.text_field :query, value: params[:query], placeholder: "Find a repository...", class: "search-input" %>
+    <%= f.select :sort, options_for_select([["Name", "name"], ["Last Updated", "updated"]], params[:sort]), {}, { class: "sort-select", onchange: "this.form.submit()" } %>
+    <%= f.submit "Search", class: "btn btn-secondary", style: "display: none;" %>
+  <% end %>
+
+  <ul class="repo-list">
+    <% @repositories.each do |repo| %>
+      <li class="repo-item">
+        <div class="repo-info">
+          <%= link_to repo.name, repository_path(repo), class: "repo-name" %>
+          <span class="repo-visibility">Public</span>
+          <p class="repo-meta">Updated <%= time_ago_in_words(repo.updated_at) %> ago</p>
+        </div>
+      </li>
+    <% end %>
+    <% if @repositories.empty? %>
+      <li class="empty-state">
+        <p>You don't have any repositories yet.</p>
+        <%= link_to "Create your first repository", new_repository_path %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<style>
+  .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .dashboard-header h1 { font-size: 1.5rem; }
+  .search-sort { display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .search-input { flex-grow: 1; padding: 0.5rem; border: 1px solid #d0d7de; border-radius: 6px; }
+  .sort-select { padding: 0.5rem; border: 1px solid #d0d7de; border-radius: 6px; }
+  .repo-list { list-style: none; padding: 0; border-top: 1px solid #d0d7de; }
+  .repo-item { padding: 1.5rem 0; border-bottom: 1px solid #d0d7de; }
+  .repo-name { font-size: 1.25rem; font-weight: bold; text-decoration: none; color: #0969da; }
+  .repo-name:hover { text-decoration: underline; }
+  .repo-visibility { font-size: 0.75rem; border: 1px solid #d0d7de; padding: 2px 8px; border-radius: 12px; color: #57606a; margin-left: 0.5rem; }
+  .repo-meta { font-size: 0.75rem; color: #57606a; margin-top: 0.25rem; }
+  .btn-primary { background: #2da44e; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; display: inline-block; }
+  .empty-state { text-align: center; padding: 3rem; color: #57606a; }
+</style>

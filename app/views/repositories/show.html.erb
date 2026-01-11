@@ -1,0 +1,46 @@
+<div class="repository-show">
+  <div class="repo-header">
+    <div class="repo-title">
+      <span class="repo-owner"><%= @repository.user.email_address.split('@').first %></span>
+      <span class="separator">/</span>
+      <span class="repo-name-link"><%= @repository.name %></span>
+      <span class="repo-visibility">Public</span>
+    </div>
+    <div class="repo-actions">
+      <%= link_to "Settings", edit_repository_path(@repository), class: "btn btn-secondary" %>
+    </div>
+  </div>
+
+  <nav class="repo-tabs">
+    <%= link_to "Code", repository_path(@repository), class: "tab active" %>
+    <%= link_to "Issues", "#", class: "tab" %>
+    <%= link_to "Pull requests", "#", class: "tab" %>
+    <%= link_to "Actions", "#", class: "tab" %>
+    <%= link_to "Settings", edit_repository_path(@repository), class: "tab" %>
+  </nav>
+
+  <div class="repo-content">
+    <div class="empty-repo">
+      <h3>Quick setup — if you’ve done this kind of thing before</h3>
+      <div class="setup-commands">
+        <pre>git remote add origin <%= request.base_url %>/<%= @repository.user.email_address.split('@').first %>/<%= @repository.name %>.git
+git branch -M main
+git push -u origin main</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .repo-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+  .repo-title { font-size: 1.25rem; display: flex; align-items: center; gap: 0.25rem; }
+  .repo-owner { color: #0969da; }
+  .separator { color: #57606a; }
+  .repo-name-link { font-weight: bold; color: #0969da; }
+  .repo-tabs { display: flex; border-bottom: 1px solid #d0d7de; margin-bottom: 1.5rem; gap: 0.5rem; }
+  .tab { padding: 0.5rem 1rem; text-decoration: none; color: #24292f; border-bottom: 2px solid transparent; font-size: 0.9rem; }
+  .tab.active { border-bottom-color: #fd8c73; font-weight: bold; }
+  .tab:hover { background: #f6f8fa; }
+  .empty-repo { border: 1px solid #d0d7de; border-radius: 6px; padding: 1.5rem; background: #f6f8fa; }
+  .setup-commands pre { background: white; padding: 1rem; border-radius: 6px; border: 1px solid #d0d7de; overflow-x: auto; }
+</style>

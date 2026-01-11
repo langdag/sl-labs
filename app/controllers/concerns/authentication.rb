@@ -3,9 +3,8 @@ module Authentication
 
   included do
     before_action :require_authentication
+    helper_method :authenticated?, :current_user
   end
-
-  attr_reader :current_user
 
   class_methods do
     def allow_unauthenticated_access(**options)
@@ -18,21 +17,55 @@ module Authentication
       current_user.present?
     end
 
+    def current_user
+      @current_user ||= resume_session
+    end
+
     def require_authentication
-      authenticate_request || render_unauthorized
+      resume_session || request_authentication
     end
 
-    def authenticate_request
-      return unless request.headers['Authorization'].present?
+    def resume_session
+      if request.headers["Authorization"].present?
+        authenticate_with_token
+      elsif cookies.signed[:jwt].present?
+        authenticate_with_cookie
+      end
+    end
 
-      token = request.headers['Authorization'].split(' ').last
+    def authenticate_with_token
+      token = request.headers["Authorization"].split(" ").last
+      decode_and_find_user(token)
+    end
+
+    def authenticate_with_cookie
+      decode_and_find_user(cookies.signed[:jwt])
+    end
+
+    def decode_and_find_user(token)
       decoded = JsonWebToken.decode(token)
-      return unless decoded
-
-      @current_user = User.find_by(id: decoded[:user_id])
+      User.find_by(id: decoded[:user_id]) if decoded
     end
 
-    def render_unauthorized
-      render json: { error: 'Unauthorized' }, status: :unauthorized
+    def request_authentication
+      respond_to do |format|
+        format.html { redirect_to login_path }
+        format.json { render json: { error: "Unauthorized" }, status: :unauthorized }
+      end
+    end
+
+    def set_jwt_cookie(user)
+      token = JsonWebToken.encode(user_id: user.id)
+      cookies.signed[:jwt] = {
+        value: token,
+        httponly: true,
+        secure: Rails.env.production?,
+        same_site: :lax,
+        expires: 24.hours.from_now
+      }
+    end
+
+    def unset_jwt_cookie
+      cookies.delete(:jwt)
     end
 end

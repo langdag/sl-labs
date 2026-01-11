@@ -1,0 +1,37 @@
+<div class="new-repo-form">
+  <h1>Create a new repository</h1>
+  <p>A repository contains all project files, including the revision history.</p>
+
+  <%= form_with model: @repository, local: true do |f| %>
+    <% if @repository.errors.any? %>
+      <div id="error_explanation">
+        <ul>
+        <% @repository.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :name, "Repository name" %><br>
+      <%= f.text_field :name, required: true, class: "wide-input" %>
+      <p class="help-text">Great repository names are short and memorable. Need inspiration? How about <code>super-guacamole</code>?</p>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Create repository", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .new-repo-form { max-width: 600px; margin: 0 auto; }
+  .new-repo-form h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .new-repo-form p { color: #57606a; margin-bottom: 1.5rem; }
+  .field { margin-bottom: 1.5rem; }
+  .wide-input { width: 100%; padding: 0.5rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; }
+  .help-text { font-size: 0.75rem; color: #57606a; margin-top: 0.25rem; }
+  .btn-primary { background: #2da44e; color: white; cursor: pointer; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold; }
+  #error_explanation { color: red; margin-bottom: 1rem; }
+</style>

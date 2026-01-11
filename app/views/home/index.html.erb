@@ -1,0 +1,25 @@
+<div class="landing-page">
+  <h1>Welcome to SL Labs</h1>
+  <p>The place where the world builds software.</p>
+  <div class="auth-buttons">
+    <%= link_to "Sign up", signup_path, class: "btn btn-primary" %>
+    <%= link_to "Sign in", login_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<style>
+  .landing-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    text-align: center;
+  }
+  .landing-page h1 { font-size: 3rem; margin-bottom: 1rem; }
+  .landing-page p { font-size: 1.5rem; color: #666; margin-bottom: 2rem; }
+  .auth-buttons { display: flex; gap: 1rem; }
+  .btn { padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: bold; }
+  .btn-primary { background: #2da44e; color: white; }
+  .btn-secondary { background: #f6f8fa; color: #24292f; border: 1px solid #d0d7de; }
+</style>

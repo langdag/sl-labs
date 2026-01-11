@@ -1,0 +1,40 @@
+<div class="auth-form">
+  <h2>Join SL Labs</h2>
+  <%= form_with model: @user, url: registrations_path, local: true do |f| %>
+    <% if @user.errors.any? %>
+      <div id="error_explanation">
+        <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :email_address %><br>
+      <%= f.email_field :email_address, required: true, autofocus: true %>
+    </div>
+    <div class="field">
+      <%= f.label :password %><br>
+      <%= f.password_field :password, required: true %>
+    </div>
+    <div class="field">
+      <%= f.label :password_confirmation %><br>
+      <%= f.password_field :password_confirmation, required: true %>
+    </div>
+    <div class="actions">
+      <%= f.submit "Sign up", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+  <p>Already have an account? <%= link_to "Sign in", login_path %>.</p>
+</div>
+
+<style>
+  .auth-form { max-width: 320px; margin: 5rem auto; border: 1px solid #d0d7de; padding: 2rem; border-radius: 6px; background: #f6f8fa; }
+  .auth-form h2 { text-align: center; margin-bottom: 1.5rem; }
+  .field { margin-bottom: 1rem; }
+  .field input { width: 100%; padding: 0.5rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; }
+  .actions .btn { width: 100%; cursor: pointer; border: none; }
+  #error_explanation { color: red; margin-bottom: 1rem; }
+</style>
