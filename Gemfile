@@ -69,3 +69,4 @@ group :test do
 end
 
 gem "git_object_store", path: "../git_object_store"
+gem "vite_rails"
