@@ -1,163 +1,183 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, Loader2, UserPlus, ShieldCheck, Github } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, UserPlus, ShieldCheck, Github, User } from 'lucide-react'
 
 const SignupForm = ({ signupPath, loginPath, csrfToken }) => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [isFocused, setIsFocused] = useState(null)
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [isFocused, setIsFocused] = useState(null)
 
-    const handleSubmit = (e) => {
-        // We let the form submit naturally to Rails controller
-        setLoading(true)
+  const handleSubmit = (e) => {
+    // We let the form submit naturally to Rails controller
+    setLoading(true)
+  }
+
+  const isPasswordMatch = password === passwordConfirmation && password !== ''
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
     }
+  }
 
-    const isPasswordMatch = password === passwordConfirmation && password !== ''
+  return (
+    <div className="auth-container">
+      <motion.div
+        className="auth-card"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <div className="auth-header">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="brand-icon"
+          >
+            <Github size={40} strokeWidth={1.5} />
+          </motion.div>
+          <h1>Create your account</h1>
+          <p>Join the SL Labs developer community</p>
+        </div>
 
-    const containerVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
-        }
-    }
+        <form action={signupPath} method="post" className="auth-form" onSubmit={handleSubmit}>
+          <input type="hidden" name="authenticity_token" value={csrfToken} />
 
-    return (
-        <div className="auth-container">
-            <motion.div
-                className="auth-card"
-                initial="hidden"
-                animate="visible"
-                variants={containerVariants}
-            >
-                <div className="auth-header">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="brand-icon"
-                    >
-                        <Github size={40} strokeWidth={1.5} />
-                    </motion.div>
-                    <h1>Create your account</h1>
-                    <p>Join the SL Labs developer community</p>
-                </div>
+          <div className={`form-group ${isFocused === 'email' ? 'focused' : ''}`}>
+            <label htmlFor="user_email_address">Email address</label>
+            <div className="input-wrapper">
+              <Mail className="input-icon" size={18} />
+              <input
+                type="email"
+                name="user[email_address]"
+                id="user_email_address"
+                required
+                autoFocus
+                placeholder="name@company.com"
+                className="form-input"
+                value={email}
+                onFocus={() => setIsFocused('email')}
+                onBlur={() => setIsFocused(null)}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
 
-                <form action={signupPath} method="post" className="auth-form" onSubmit={handleSubmit}>
-                    <input type="hidden" name="authenticity_token" value={csrfToken} />
+          <div className={`form-group ${isFocused === 'username' ? 'focused' : ''}`}>
+            <label htmlFor="user_username">Username</label>
+            <div className="input-wrapper">
+              <User className="input-icon" size={18} />
+              <input
+                type="text"
+                name="user[username]"
+                id="user_username"
+                required
+                placeholder="johndoe"
+                className="form-input"
+                value={username}
+                onFocus={() => setIsFocused('username')}
+                onBlur={() => setIsFocused(null)}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          </div>
 
-                    <div className={`form-group ${isFocused === 'email' ? 'focused' : ''}`}>
-                        <label htmlFor="user_email_address">Email address</label>
-                        <div className="input-wrapper">
-                            <Mail className="input-icon" size={18} />
-                            <input
-                                type="email"
-                                name="user[email_address]"
-                                id="user_email_address"
-                                required
-                                autoFocus
-                                placeholder="name@company.com"
-                                className="form-input"
-                                value={email}
-                                onFocus={() => setIsFocused('email')}
-                                onBlur={() => setIsFocused(null)}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                    </div>
+          <div className={`form-group ${isFocused === 'password' ? 'focused' : ''}`}>
+            <label htmlFor="user_password">Password</label>
+            <div className="input-wrapper">
+              <Lock className="input-icon" size={18} />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="user[password]"
+                id="user_password"
+                required
+                placeholder="••••••••"
+                className="form-input"
+                value={password}
+                onFocus={() => setIsFocused('password')}
+                onBlur={() => setIsFocused(null)}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
 
-                    <div className={`form-group ${isFocused === 'password' ? 'focused' : ''}`}>
-                        <label htmlFor="user_password">Password</label>
-                        <div className="input-wrapper">
-                            <Lock className="input-icon" size={18} />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="user[password]"
-                                id="user_password"
-                                required
-                                placeholder="••••••••"
-                                className="form-input"
-                                value={password}
-                                onFocus={() => setIsFocused('password')}
-                                onBlur={() => setIsFocused(null)}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => setShowPassword(!showPassword)}
-                                aria-label="Toggle password visibility"
-                            >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                        </div>
-                    </div>
+          <div className={`form-group ${isFocused === 'password_confirmation' ? 'focused' : ''}`}>
+            <label htmlFor="user_password_confirmation">Confirm Password</label>
+            <div className="input-wrapper">
+              <ShieldCheck className={`input-icon ${isPasswordMatch ? 'success' : ''}`} size={18} />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="user[password_confirmation]"
+                id="user_password_confirmation"
+                required
+                placeholder="••••••••"
+                className="form-input"
+                value={passwordConfirmation}
+                onFocus={() => setIsFocused('password_confirmation')}
+                onBlur={() => setIsFocused(null)}
+                onChange={(e) => setPasswordConfirmation(e.target.value)}
+              />
+            </div>
+          </div>
 
-                    <div className={`form-group ${isFocused === 'password_confirmation' ? 'focused' : ''}`}>
-                        <label htmlFor="user_password_confirmation">Confirm Password</label>
-                        <div className="input-wrapper">
-                            <ShieldCheck className={`input-icon ${isPasswordMatch ? 'success' : ''}`} size={18} />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="user[password_confirmation]"
-                                id="user_password_confirmation"
-                                required
-                                placeholder="••••••••"
-                                className="form-input"
-                                value={passwordConfirmation}
-                                onFocus={() => setIsFocused('password_confirmation')}
-                                onBlur={() => setIsFocused(null)}
-                                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            />
-                        </div>
-                    </div>
+          <motion.button
+            type="submit"
+            className="btn-auth-submit"
+            disabled={loading}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="btn-content"
+                >
+                  <Loader2 className="spinner" size={20} />
+                  <span>Creating account...</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="btn-content"
+                >
+                  <span>Sign up</span>
+                  <UserPlus size={18} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </form>
 
-                    <motion.button
-                        type="submit"
-                        className="btn-auth-submit"
-                        disabled={loading}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                    >
-                        <AnimatePresence mode="wait">
-                            {loading ? (
-                                <motion.div
-                                    key="loading"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="btn-content"
-                                >
-                                    <Loader2 className="spinner" size={20} />
-                                    <span>Creating account...</span>
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="idle"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="btn-content"
-                                >
-                                    <span>Sign up</span>
-                                    <UserPlus size={18} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.button>
-                </form>
+        <div className="auth-footer">
+          <p>Already have an account? <a href={loginPath} className="accent-link">Sign in</a></p>
+        </div>
+      </motion.div>
 
-                <div className="auth-footer">
-                    <p>Already have an account? <a href={loginPath} className="accent-link">Sign in</a></p>
-                </div>
-            </motion.div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .auth-container {
           min-height: 85vh;
           display: flex;
@@ -353,8 +373,8 @@ const SignupForm = ({ signupPath, loginPath, csrfToken }) => {
           text-decoration: underline;
         }
       ` }} />
-        </div>
-    )
+    </div>
+  )
 }
 
 export default SignupForm

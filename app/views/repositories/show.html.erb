@@ -1,7 +1,9 @@
 <div class="repository-show">
   <div class="repo-header">
     <div class="repo-title">
-      <span class="repo-owner"><%= @repository.user.email_address.split('@').first %></span>
+      <%= link_to @repository.user.username || @repository.user.email_address.split('@').first, 
+                  user_profile_path(@repository.user.username || @repository.user.email_address.split('@').first), 
+                  class: "repo-owner" %>
       <span class="separator">/</span>
       <span class="repo-name-link"><%= @repository.name %></span>
       <span class="repo-visibility">Public</span>
