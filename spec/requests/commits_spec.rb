@@ -5,10 +5,14 @@ RSpec.describe 'Commits API', type: :request do
   let!(:user) { User.create!(email_address: 'test@example.com', password: 'password123') }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Authorization' => "Bearer #{token}", 'Content-Type' => 'application/json' } }
-  let!(:repository) { Repository.create!(name: 'commits-repo', user: user) }
+  let!(:repository) do
+    repo = Repository.create!(name: 'commits-repo', user: user)
+    RepositoryService.new(repo).call
+    repo
+  end
 
   after do
-    FileUtils.rm_rf(Rails.root.join('storage', 'repositories', 'commits-repo'))
+    FileUtils.rm_rf(repository.disk_path)
   end
 
   describe 'GET /repositories/:repository_id/commits' do
@@ -25,7 +29,7 @@ RSpec.describe 'Commits API', type: :request do
       before do
         # Manually create a commit in the repo
         repo_path = repository.disk_path.to_s
-        git_repo = GitObjectStore::Repository.new(repo_path)
+        git_repo = repository.git_repo
         
         # Write a tree
         tree_sha = GitObjectStore::GitObject.write_raw(git_repo, 'tree', "")

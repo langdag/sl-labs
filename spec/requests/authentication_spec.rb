@@ -33,7 +33,7 @@ RSpec.describe 'Authentication', type: :request do
       before { post '/login', params: invalid_credentials, headers: headers }
 
       it 'returns a failure message' do
-        expect(json['error']).to match(/Invalid username or password/)
+        expect(json['error']).to match("Invalid email or password")
       end
 
       it 'returns status code 401' do

@@ -5,11 +5,15 @@ RSpec.describe 'Files API', type: :request do
   let!(:user) { User.create!(email_address: 'test@example.com', password: 'password123') }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Authorization' => "Bearer #{token}", 'Content-Type' => 'application/json' } }
-  let!(:repository) { Repository.create!(name: 'files-repo', user: user) }
+  let!(:repository) do
+    repo = Repository.create!(name: 'files-repo', user: user)
+    RepositoryService.new(repo).call
+    repo
+  end
 
   before do
     repo_path = repository.disk_path.to_s
-    git_repo = GitObjectStore::Repository.new(repo_path)
+    git_repo = repository.git_repo
     
     # Create a blob
     @blob_content = "Hello World"
@@ -23,7 +27,7 @@ RSpec.describe 'Files API', type: :request do
   end
 
   after do
-    FileUtils.rm_rf(Rails.root.join('storage', 'repositories', 'files-repo'))
+    FileUtils.rm_rf(repository.disk_path)
   end
 
   describe 'GET /repositories/:repository_id/trees/:sha' do

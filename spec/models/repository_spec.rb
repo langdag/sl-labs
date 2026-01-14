@@ -23,32 +23,30 @@ RSpec.describe Repository, type: :model do
     end
   end
 
-  describe '#create' do
-    let(:repo_name) { "test-disk-creation-#{Time.now.to_i}" }
-    let(:repo) { Repository.create(name: repo_name, user: user) }
-
-    after do
-      FileUtils.rm_rf(repo.disk_path) if repo&.disk_path
-    end
-
-    it 'creates a git repository on disk' do
-      expect(repo).to be_persisted
-      expect(Dir.exist?(repo.disk_path)).to be true
-      expect(Dir.exist?(File.join(repo.disk_path, '.git'))).to be true
+  describe '#disk_path' do
+    it 'returns the expected path' do
+      repo = Repository.new(id: 123, name: 'test-repo')
+      expect(repo.disk_path.to_s).to end_with('storage/repositories/123_test-repo')
     end
   end
 
   describe '#git_repo' do
-    let(:repo) { Repository.create(name: "test-accessor-#{Time.now.to_i}", user: user) }
+    let(:repo) { Repository.create!(name: "test-accessor-#{Time.now.to_i}", user: user) }
+    let(:disk_path) { repo.disk_path }
+
+    before do
+      FileUtils.mkdir_p(File.dirname(disk_path))
+      GitObjectStore::Repository.init(disk_path)
+    end
 
     after do
-      FileUtils.rm_rf(repo.disk_path) if repo&.disk_path
+      FileUtils.rm_rf(disk_path)
     end
 
     it 'returns a GitObjectStore::Repository instance' do
       git_store = repo.git_repo
       expect(git_store).to be_a(GitObjectStore::Repository)
-      expect(git_store.worktree.to_s).to eq(repo.disk_path.to_s)
+      expect(git_store.worktree.to_s).to eq(disk_path.to_s)
     end
   end
 end

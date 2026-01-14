@@ -27,6 +27,8 @@ class RepositoriesController < ApplicationController
   def update
     respond_to do |format|
       if @repository.update(repository_params)
+        RepositoryService.new(@repository).call
+
         format.html { redirect_to @repository, notice: "Repository was successfully updated." }
         format.json { render json: @repository, status: :ok }
       else
@@ -38,6 +40,8 @@ class RepositoriesController < ApplicationController
 
   def destroy
     @repository.destroy
+    RepositoryService.new(@repository).call
+
     respond_to do |format|
       format.html { redirect_to repositories_path, notice: "Repository was successfully deleted." }
       format.json { head :no_content }
@@ -49,6 +53,7 @@ class RepositoriesController < ApplicationController
 
     respond_to do |format|
       if @repository.save
+        RepositoryService.new(@repository).call
         format.html { redirect_to @repository, notice: "Repository was successfully created." }
         format.json { render json: @repository, status: :created }
       else
