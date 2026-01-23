@@ -3,6 +3,8 @@ class CommitsController < ApplicationController
 
   def index
     git_repo = @repository.git_repo
+    return render json: [] unless git_repo
+
     head_sha = git_repo.resolve_ref('HEAD')
     
     if head_sha

@@ -85,6 +85,17 @@
         <% end %>
       </div>
     </div>
+
+    <div class="contributions-section">
+      <h2 class="section-title"><%= @user.total_contributions_last_year %> contributions in the last year</h2>
+      <div id="contribution-calendar-root"
+           data-contributions="<%= @daily_contributions.to_json %>"
+           data-total-count="<%= @user.total_contributions_last_year %>">
+        <div class="calendar-fallback">
+          <p>Loading contribution activity...</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

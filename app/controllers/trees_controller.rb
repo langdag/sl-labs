@@ -4,6 +4,7 @@ class TreesController < ApplicationController
   def show
     sha = params[:sha]
     git_repo = @repository.git_repo
+    return render json: { error: 'Repository not found on disk' }, status: :not_found unless git_repo
     
     begin
       tree = GitObjectStore::GitObject.find(git_repo, sha)

@@ -3,7 +3,10 @@ class HomeController < ApplicationController
 
   def index
     if authenticated?
-      redirect_to repositories_path
+      @repositories = current_user.repositories.limit(5)
+      @activities = Activity.where(repository_id: current_user.repository_ids)
+                           .order(occurred_at: :desc)
+                           .limit(20)
     end
   end
 end

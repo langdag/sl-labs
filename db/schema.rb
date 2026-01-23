@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_175708) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_23_132938) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_175708) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "activities", force: :cascade do |t|
+    t.string "action_type", null: false
+    t.string "before_sha"
+    t.integer "commit_count", default: 0
+    t.datetime "created_at", null: false
+    t.string "head_sha"
+    t.datetime "occurred_at", null: false
+    t.string "ref"
+    t.bigint "repository_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["action_type"], name: "index_activities_on_action_type"
+    t.index ["occurred_at"], name: "index_activities_on_occurred_at"
+    t.index ["repository_id"], name: "index_activities_on_repository_id"
+    t.index ["user_id"], name: "index_activities_on_user_id"
+  end
+
+  create_table "commits", force: :cascade do |t|
+    t.string "author_email", null: false
+    t.string "author_name"
+    t.datetime "committed_at", null: false
+    t.datetime "created_at", null: false
+    t.text "message"
+    t.jsonb "parent_shas", default: []
+    t.bigint "repository_id", null: false
+    t.string "sha", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["author_email"], name: "index_commits_on_author_email"
+    t.index ["committed_at"], name: "index_commits_on_committed_at"
+    t.index ["repository_id", "sha"], name: "index_commits_on_repository_id_and_sha", unique: true
+    t.index ["repository_id"], name: "index_commits_on_repository_id"
+    t.index ["sha"], name: "index_commits_on_sha"
+    t.index ["user_id"], name: "index_commits_on_user_id"
+  end
+
   create_table "repositories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -69,5 +105,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_175708) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "activities", "repositories"
+  add_foreign_key "activities", "users"
+  add_foreign_key "commits", "repositories"
+  add_foreign_key "commits", "users"
   add_foreign_key "repositories", "users"
 end

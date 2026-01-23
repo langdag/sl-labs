@@ -2,6 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import LoginForm from '../components/LoginForm'
 import SignupForm from '../components/SignupForm'
+import ContributionCalendar from '../components/ContributionCalendar'
 
 const init = () => {
     // Mount Login Form
@@ -48,6 +49,25 @@ const init = () => {
         }
     } else {
         console.log('Mount node #signup-form-root not found.')
+    }
+
+    // Mount Contribution Calendar
+    const calendarNode = document.getElementById('contribution-calendar-root')
+    if (calendarNode) {
+        try {
+            const contributions = JSON.parse(calendarNode.dataset.contributions || '{}')
+            const totalCount = parseInt(calendarNode.dataset.totalCount || '0', 10)
+
+            const root = createRoot(calendarNode)
+            root.render(
+                <ContributionCalendar
+                    contributions={contributions}
+                    totalCount={totalCount}
+                />
+            )
+        } catch (error) {
+            console.error('Failed to render ContributionCalendar component:', error)
+        }
     }
 }
 
