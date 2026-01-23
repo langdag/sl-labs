@@ -63,9 +63,8 @@ class CommitIndexerService
     # Fail if we can't parse metadata required by the database
     raise "Malformed author data: #{git_commit.author}" unless author_data
 
-    # Find user (cached) or fail
-    user = find_user(author_data[:email])
-    raise "User not found for email: #{author_data[:email]}" unless user
+    # Find user (cached) or fallback to repo owner
+    user = find_user(author_data[:email]) || @repository.user
 
     Commit.find_or_create_by!(
       repository: @repository,

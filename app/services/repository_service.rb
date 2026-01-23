@@ -46,12 +46,24 @@ class RepositoryService < BaseService
 
     hook_path = hooks_dir.join("post-receive")
     
+    # We must unset Bundler/Git environment variables that Git sets during a push,
+    # otherwise the 'rails runner' will try to load gems using those variables and fail.
     hook_content = <<~BASH
       #!/bin/bash
       while read oldrev newrev refname
       do
-        # Trigger SL Labs Indexer
-        cd #{Rails.root} && bin/rails runner "CommitIndexerService.new(Repository.find(#{@repository.id})).index('$refname')"
+        # Trigger SL Labs Indexer in a clean environment
+        (
+          cd #{Rails.root}
+          unset BUNDLE_GEMFILE
+          unset BUNDLE_BIN_PATH
+          unset GEM_HOME
+          unset GEM_PATH
+          unset RUBYOPT
+          unset GIT_DIR
+          unset GIT_QUARANTINE_PATH
+          bin/rails runner "CommitIndexerService.new(Repository.find(#{@repository.id})).index('$refname')"
+        )
       done
     BASH
 

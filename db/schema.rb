@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_23_132938) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_17_092723) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,7 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_23_132938) do
     t.bigint "repository_id", null: false
     t.string "sha", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.index ["author_email"], name: "index_commits_on_author_email"
     t.index ["committed_at"], name: "index_commits_on_committed_at"
     t.index ["repository_id", "sha"], name: "index_commits_on_repository_id_and_sha", unique: true
