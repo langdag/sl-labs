@@ -9,7 +9,7 @@ class Repository < ApplicationRecord
   end
 
   def git_repo
-    return nil unless File.directory?(disk_path.join(".git"))
+    return nil unless File.directory?(disk_path.join("objects"))
     @git_repo ||= GitObjectStore::Repository.new(disk_path)
   end
 end

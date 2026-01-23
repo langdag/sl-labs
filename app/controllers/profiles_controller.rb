@@ -1,13 +1,8 @@
 class ProfilesController < ApplicationController
   before_action :set_user, only: [:show]
+
   def show
     @repositories = @user.repositories.order(updated_at: :desc)
-
-    # Trigger indexing for each repo to ensure we have data for the demo
-    @repositories.each do |repo|
-      CommitIndexerService.new(repo).index
-    end
-
     @daily_contributions = @user.daily_contributions
   end
 
