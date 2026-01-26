@@ -73,7 +73,7 @@
         <% @repositories.limit(6).each do |repo| %>
           <div class="pinned-repo-card">
             <div class="repo-header">
-              <%= link_to repo.name, repository_path(repo), class: "repo-link" %>
+              <%= link_to repo.name, repository_pretty_root_path(username: @user.username, repository_name: repo.name), class: "repo-link" %>
               <span class="repo-badge">Public</span>
             </div>
             <p class="repo-desc">Git repository managed by SL Labs.</p>

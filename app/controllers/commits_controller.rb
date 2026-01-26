@@ -5,8 +5,8 @@ class CommitsController < ApplicationController
     git_repo = @repository.git_repo
     return render json: [] unless git_repo
 
-    head_sha = git_repo.resolve_ref('HEAD')
-    
+    head_sha = git_repo.resolve_ref("HEAD")
+
     if head_sha
       commit = GitObjectStore::GitObject.find(git_repo, head_sha)
       render json: [serialize_commit(commit)]
@@ -18,7 +18,8 @@ class CommitsController < ApplicationController
   private
 
   def set_repository
-    @repository = current_user.repositories.find(params[:repository_id])
+    user = User.find_by!(username: params[:username])
+    @repository = user.repositories.find_by!(name: params[:repository_name])
   end
 
   def serialize_commit(commit)

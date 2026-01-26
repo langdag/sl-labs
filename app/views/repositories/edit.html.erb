@@ -5,7 +5,7 @@
     <h2>General</h2>
     <div class="setting-item">
       <h3>Repository name</h3>
-      <%= form_with model: @repository, local: true do |f| %>
+      <%= form_with model: @repository, url: update_repository_pretty_path(username: @repository.user.username, repository_name: @repository.name), method: :patch, local: true do |f| %>
         <%= f.text_field :name, class: "wide-input" %>
         <%= f.submit "Rename", class: "btn btn-secondary" %>
       <% end %>
@@ -19,7 +19,7 @@
         <h3>Delete this repository</h3>
         <p>Once you delete a repository, there is no going back. Please be certain.</p>
       </div>
-      <%= button_to "Delete this repository", repository_path(@repository), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+      <%= button_to "Delete this repository", destroy_repository_pretty_path(username: @repository.user.username, repository_name: @repository.name), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
     </div>
   </section>
 </div>

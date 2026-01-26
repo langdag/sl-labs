@@ -14,7 +14,7 @@
                   <strong><%= activity.user.display_name %></strong> 
                   <%= activity.action_type %>ed 
                   <strong><%= activity.commit_count %> commits</strong> to 
-                  <%= link_to activity.repository.name, repository_path(activity.repository) %>
+                  <%= link_to activity.repository.name, repository_pretty_root_path(username: activity.repository.user.username, repository_name: activity.repository.name) %>
                 </p>
                 <div class="activity-meta">
                   <%= time_ago_in_words(activity.occurred_at) %> ago
@@ -36,7 +36,7 @@
         <ul class="sidebar-list">
           <% @repositories.each do |repo| %>
             <li>
-              <%= link_to repo.name, repository_path(repo) %>
+              <%= link_to repo.name, repository_pretty_root_path(username: repo.user.username, repository_name: repo.name) %>
             </li>
           <% end %>
           <% if @repositories.empty? %>

@@ -57,12 +57,17 @@ class RepositoryService < BaseService
           cd #{Rails.root}
           unset BUNDLE_GEMFILE
           unset BUNDLE_BIN_PATH
+          unset BUNDLE_PATH
+          unset BUNDLE_APP_CONFIG
           unset GEM_HOME
           unset GEM_PATH
           unset RUBYOPT
           unset GIT_DIR
           unset GIT_QUARANTINE_PATH
-          bin/rails runner "CommitIndexerService.new(Repository.find(#{@repository.id})).index('$refname')"
+          
+          # Force a fresh bundle environment
+          export RAILS_ENV=development
+          #{Rails.root}/bin/rails runner "CommitIndexerService.new(Repository.find(#{@repository.id})).index('$refname')"
         )
       done
     BASH
