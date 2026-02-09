@@ -41,7 +41,7 @@ class RepositoriesController < ApplicationController
       render :file_content, formats: [:html]
     elsif @item.is_a?(GitObjectStore::Tree)
       @entries = @item.entries
-      @last_commits = {} 
+      @latest_commit = service.commit
       render :show
     else
       # If at root and nothing found, show setup page

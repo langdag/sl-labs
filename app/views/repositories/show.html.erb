@@ -23,19 +23,40 @@
 
   <div class="repo-content">
     <% if @entries.any? %>
+      <% if @latest_commit %>
+        <div class="latest-commit-banner">
+          <div class="commit-author">
+            <strong><%= @latest_commit[:author] %></strong>
+            <span class="commit-message"><%= @latest_commit[:message] %></span>
+          </div>
+          <div class="commit-meta">
+            <span class="commit-time"><%= time_ago_in_words(@latest_commit[:committed_date]) %> ago</span>
+            <span class="commit-sha"><%= @latest_commit[:sha][0..7] %></span>
+          </div>
+        </div>
+      <% end %>
+
       <div class="file-browser">
         <div class="file-list">
           <% @entries.each do |entry| %>
             <div class="file-row">
               <span class="file-name">
                 <% full_path = @path.present? ? "#{@path}/#{entry[:name]}" : entry[:name] %>
+                 <span class="icon"><%= entry[:mode] == "40000" ? "📁" : "📄" %></span>
                 <% if entry[:mode] == "40000" %>
                   <%= link_to entry[:name], repository_tree_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
                 <% else %>
                   <%= link_to entry[:name], repository_blob_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
                 <% end %>
               </span>
-              <span class="file-type"><%= entry[:mode] == "40000" ? "Directory" : "File" %></span>
+              
+              <span class="file-commit-message">
+                <%= @latest_commit ? @latest_commit[:message] : "" %>
+              </span>
+
+              <span class="file-age">
+                <%= @latest_commit ? time_ago_in_words(@latest_commit[:committed_date]) : "" %>
+              </span>
             </div>
           <% end %>
         </div>
@@ -66,9 +87,27 @@ git push -u origin main</pre>
   .tab { padding: 8px 4px; text-decoration: none; color: var(--text-secondary); border-bottom: 2px solid transparent; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
   .tab:hover { color: var(--text-primary); }
   .tab.active { color: var(--text-primary); border-bottom-color: #fd8c73; font-weight: 600; }
+  
+  /* Latest Commit Banner */
+  .latest-commit-banner {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  .commit-author { display: flex; align-items: center; gap: 8px; }
+  .commit-message { color: var(--text-primary); }
+  .commit-meta { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.85rem; }
+  .commit-sha { font-family: monospace; background: rgba(139, 148, 158, 0.1); padding: 2px 6px; border-radius: 4px; }
+  .commit-time { color: var(--text-secondary); }
 
   /* File Browser Styling */
-  .file-browser { border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; background: var(--bg-main); }
+  .file-browser { border: 1px solid var(--border-color); border-radius: 0 0 6px 6px; overflow: hidden; background: var(--bg-main); }
   .file-list { display: flex; flex-direction: column; }
   .file-row { 
     display: flex; 
@@ -81,11 +120,23 @@ git push -u origin main</pre>
   .file-row:last-child { border-bottom: none; }
   .file-row:hover { background: rgba(139, 148, 158, 0.1); }
   
-  .file-name { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
-  .file-name a { color: var(--text-primary); text-decoration: none; font-size: 0.9rem; }
+  .file-name { display: flex; align-items: center; gap: 10px; width: 300px; flex-shrink: 0; }
+  .file-name a { color: var(--text-primary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .file-name a:hover { color: var(--accent-color); text-decoration: underline; }
-  
-  .file-type { font-size: 0.8rem; color: var(--text-secondary); min-width: 80px; text-align: right; }
+  .file-name .icon { font-size: 1rem; width: 1.2rem; display: inline-block; text-align: center; }
+
+  .file-commit-message { 
+    flex-grow: 1; 
+    font-size: 0.85rem; 
+    color: var(--text-secondary); 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    padding: 0 16px;
+  }
+  .file-commit-message:hover { color: var(--accent-color); cursor: default; }
+
+  .file-age { font-size: 0.85rem; color: var(--text-secondary); width: 120px; text-align: right; flex-shrink: 0; }
 
   .empty-repo { border: 1px solid var(--border-color); border-radius: 6px; padding: 2rem; background: var(--bg-secondary); text-align: center; }
   .empty-repo h3 { margin-top: 0; color: var(--text-primary); }

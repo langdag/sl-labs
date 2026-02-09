@@ -1,5 +1,5 @@
 class TreeNavigationService < BaseService
-  attr_reader :resolved_ref
+  attr_reader :resolved_ref, :commit
 
   def initialize(repo, ref, path = nil)
     @repo = repo
@@ -19,7 +19,9 @@ class TreeNavigationService < BaseService
 
     root_tree = case object
                 when GitObjectStore::Tree then object
-                when GitObjectStore::Commit then GitObjectStore::GitObject.find(repo, object.tree)
+                when GitObjectStore::Commit
+                  @commit = latest_commit(object)
+                  GitObjectStore::GitObject.find(repo, object.tree)
                 else return nil
                 end
 
@@ -28,14 +30,26 @@ class TreeNavigationService < BaseService
 
   private
 
+  def latest_commit(object)
+    # Extract timestamp from "Name <email> 1234567890 +0000"
+    match = object.author.match(/(\d+) [+-]\d{4}\z/)
+    date = match ? Time.at(match[1].to_i) : Time.current
+
+    {
+      sha: object.sha,
+      author: object.author.split('<').first.strip,
+      message: object.message.split("\n").first,
+      committed_date: date
+    }
+  end
+
   def git_object_repo
     @git_object_repo ||= @repo.git_repo
   end
 
   def reference_hash
-    # 1. Try to resolve exactly what was requested (HEAD, master, or a specific branch)
     sha = git_object_repo&.resolve_ref(@ref)
-    
+
     # 2. If it's HEAD and it failed (the "unborn branch" issue), look for fallbacks
     if sha.nil? && @ref == "HEAD"
       ["master", "main"].each do |fallback|
