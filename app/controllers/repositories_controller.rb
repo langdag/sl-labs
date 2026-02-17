@@ -27,7 +27,7 @@ class RepositoriesController < ApplicationController
     @ref = service.resolved_ref # Use detected branch name (master/main) in the view
 
     # If at the landing page (no ref/path) and content exists, redirect to the default branch
-    if params[:ref].blank? && @item.is_a?(GitObjectStore::Tree)
+    if params[:ref].blank? && @item.is_a?(GitService::GetTreeResponse)
       return redirect_to repository_tree_path(
         username: @repository.user.username,
         repository_name: @repository.name,
@@ -36,10 +36,10 @@ class RepositoriesController < ApplicationController
       )
     end
 
-    if @item.is_a?(GitObjectStore::Blob)
-      @content = @item.data.force_encoding('UTF-8').scrub
+    if @item.is_a?(::GitService::GetBlobResponse)
+      @content = @item.data.dup.force_encoding('UTF-8').scrub
       render :file_content, formats: [:html]
-    elsif @item.is_a?(GitObjectStore::Tree)
+    elsif @item.is_a?(GitService::GetTreeResponse)
       @entries = @item.entries
       @latest_commit = service.commit
       render :show

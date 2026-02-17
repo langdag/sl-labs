@@ -70,3 +70,6 @@ end
 
 gem "git_object_store", path: "../git_object_store"
 gem "vite_rails"
+gem "grpc"
+gem "google-protobuf"
+gem "grpc-tools"
