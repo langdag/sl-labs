@@ -47,7 +47,7 @@ class TreeNavigationService < BaseService
     return fetch_tree(current_sha) if path_string.blank?
 
     path_string.split("/").reject(&:blank?).reduce(fetch_tree(current_sha)) do |current_object, segment|
-      return nil unless current_object.is_a?(GitService::GetTreeResponse)
+      return nil unless current_object.is_a?(::Sl::Git::GetTreeResponse)
 
       entry = current_object.entries.find { |e| e.name == segment }
       return nil unless entry
