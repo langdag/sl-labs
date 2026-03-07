@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "/:username/:repository_name/tree/(:ref)(/*path)", to: "repositories#show", as: :repository_tree, constraints: { ref: /[^\/]+/ }, format: false
   get "/:username/:repository_name/blob/(:ref)(/*path)", to: "repositories#show", as: :repository_blob, constraints: { ref: /[^\/]+/ }, format: false
   get "/:username/:repository_name/commits", to: "commits#index", as: :repository_commits
+  get "/:username/:repository_name/commit/:sha", to: "commits#show", as: :repository_commit
   
   # Repository Management inside the slug
   scope "/:username/:repository_name" do

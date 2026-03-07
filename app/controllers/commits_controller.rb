@@ -2,16 +2,39 @@ class CommitsController < ApplicationController
   before_action :set_repository
 
   def index
-    git_repo = @repository.git_repo
-    return render json: [] unless git_repo
+    @ref = params[:ref] || "HEAD"
+    @path = params[:path] || ""
 
-    head_sha = git_repo.resolve_ref("HEAD")
-
-    if head_sha
-      commit = GitObjectStore::GitObject.find(git_repo, head_sha)
-      render json: [serialize_commit(commit)]
+    # 1. Resolve Ref
+    @sha, @ref = GitServiceClient.resolve_ref_with_fallback(@repository, @ref)
+    
+    if @sha.present?
+      # 2. Get history via gRPC
+      @commit_response = GitServiceClient.get_commits(@repository, @sha)
+      @commits = @commit_response&.entries || []
+      
+      if params[:author].present?
+        @commits = @commits.select { |c| c.author.downcase.include?(params[:author].downcase) }
+      end
     else
-      render json: []
+      @commits = []
+    end
+
+    respond_to do |format|
+      format.html # renders index.html.erb
+      format.json { render json: @commits.map { |c| serialize_commit(c) } }
+    end
+  end
+
+  def show
+    @sha = params[:sha]
+    
+    # We use get_commits with limit = 1 essentially by just taking the first entry
+    @commit_response = GitServiceClient.get_commits(@repository, @sha)
+    @commit = @commit_response&.entries&.first
+    
+    if @commit.nil?
+      redirect_to repository_pretty_root_path(username: @repository.user.username, repository_name: @repository.name), alert: "Commit not found."
     end
   end
 
@@ -27,9 +50,8 @@ class CommitsController < ApplicationController
       sha: commit.sha,
       message: commit.message,
       author: commit.author,
-      committer: commit.committer,
-      tree: commit.tree,
-      parents: commit.parents
+      tree: commit.tree_sha,
+      parents: commit.parent_shas
     }
   end
 end

@@ -1,0 +1,111 @@
+<div class="repository-show">
+  <div class="repo-header">
+    <div class="repo-title">
+      <%= link_to @repository.user.username, user_profile_path(@repository.user.username), class: "repo-owner" %>
+      <span class="separator">/</span>
+      <span class="repo-name-link"><%= @repository.name %></span>
+    </div>
+  </div>
+
+  <nav class="repo-tabs">
+    <%= link_to "Code", repository_pretty_root_path(username: @repository.user.username, repository_name: @repository.name), class: "tab" %>
+    <div class="tab-spacer"></div>
+    <div class="branch-selector">
+      <span class="icon">🌿</span>
+      <strong><%= @ref %></strong>
+    </div>
+    <div class="tab-spacer"></div>
+    <%= link_to "Commits", repository_commits_path(username: @repository.user.username, repository_name: @repository.name), class: "tab active" %>
+  </nav>
+
+  <div class="commits-list">
+    <% if params[:author].present? %>
+      <div class="filter-banner">
+        <span>Showing commits by <strong><%= params[:author] %></strong></span>
+        <%= link_to "Clear filter", repository_commits_path(username: @repository.user.username, repository_name: @repository.name), class: "clear-filter" %>
+      </div>
+    <% end %>
+
+    <% if @commits.any? %>
+      <% @commits.each do |commit| %>
+        <div class="commit-row">
+          <div class="commit-main">
+            <div class="commit-message-title">
+              <%= link_to commit.message.split("\n").first, repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: commit.sha), class: "commit-link" %>
+            </div>
+            <div class="commit-meta">
+              <strong><%= link_to commit.author.split('<').first.strip, repository_commits_path(username: @repository.user.username, repository_name: @repository.name, author: commit.author.split('<').first.strip), class: "author-link" %></strong>
+              committed 
+              <span class="commit-time"><%= time_ago_in_words(Time.at(commit.committed_at)) %> ago</span>
+            </div>
+          </div>
+          <div class="commit-actions">
+             <%= link_to commit.sha[0..7], repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: commit.sha), class: "commit-sha" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">
+        No commits found for <strong><%= @ref %></strong> <%= "(SHA: #{@sha})" if @sha.present? %><%= " by #{params[:author]}" if params[:author].present? %>.
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .commit-row {
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    background: var(--bg-main);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .commit-row:first-child { border-radius: 6px 6px 0 0; }
+  .commit-row:last-child { border-bottom: 1px solid var(--border-color); border-radius: 0 0 6px 6px; }
+
+  .filter-banner {
+    padding: 12px 16px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+  .filter-banner + .commit-row { border-radius: 0; }
+  
+  .clear-filter {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
+  .clear-filter:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+  }
+
+  .tab.active { color: var(--text-primary); border-bottom-color: #fd8c73; font-weight: 600; }
+  
+  .tab-spacer { flex-grow: 1; }
+  .branch-selector { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--text-primary); background: var(--bg-secondary); padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border-color); }
+  .branch-selector .icon { font-size: 0.8rem; }
+
+  /* Latest Commit Banner */
+  .commit-message-title { font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .commit-link { color: var(--text-primary); text-decoration: none; }
+  .commit-link:hover { color: var(--accent-color); text-decoration: underline; }
+  
+  .commit-meta { font-size: 0.85rem; color: var(--text-secondary); }
+  .author-link { color: var(--text-primary); text-decoration: none; }
+  .author-link:hover { color: var(--accent-color); text-decoration: underline; }
+  
+  .commit-sha-short { font-family: monospace; }
+  .commit-actions { color: var(--text-secondary); font-size: 0.85rem; font-family: monospace; }
+  .commit-sha { color: var(--text-secondary); text-decoration: none; }
+  .commit-sha:hover { color: var(--accent-color); text-decoration: underline; }
+</style>

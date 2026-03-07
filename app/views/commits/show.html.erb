@@ -1,0 +1,131 @@
+<div class="repository-show">
+  <div class="repo-header">
+    <div class="repo-title">
+      <%= link_to @repository.user.username, user_profile_path(@repository.user.username), class: "repo-owner" %>
+      <span class="separator">/</span>
+      <span class="repo-name-link"><%= @repository.name %></span>
+    </div>
+  </div>
+
+  <div class="commit-details-container">
+    <div class="commit-details-header">
+      <div class="commit-title">
+        <%= @commit.message.split("\n").first %>
+      </div>
+      <% if @commit.message.split("\n").size > 1 %>
+        <div class="commit-body">
+          <%= @commit.message.split("\n")[1..-1].join("\n").strip %>
+        </div>
+      <% end %>
+
+      <div class="commit-metadata-row">
+        <div class="commit-author-info">
+          <%= link_to @commit.author.split('<').first.strip, repository_commits_path(username: @repository.user.username, repository_name: @repository.name, author: @commit.author.split('<').first.strip), class: "author-name" %>
+          committed <%= time_ago_in_words(Time.at(@commit.committed_at)) %> ago
+        </div>
+        <div class="commit-shas-info">
+          <span class="sha-label">commit</span>
+          <span class="sha-value"><%= @commit.sha %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="commit-parents-info">
+      <% if @commit.parent_shas.any? %>
+        <span><strong><%= @commit.parent_shas.size %></strong> parent<%= "s" if @commit.parent_shas.size > 1 %></span>
+        <% @commit.parent_shas.each do |parent_sha| %>
+          <%= link_to parent_sha[0..7], repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: parent_sha), class: "parent-sha-link" %>
+        <% end %>
+      <% else %>
+        <span>Initial commit</span>
+      <% end %>
+      <span class="separator-dot">•</span>
+      <span><strong>Tree</strong> <%= @commit.tree_sha[0..7] %></span>
+    </div>
+
+    <div class="commit-files-placeholder">
+      <p class="text-secondary" style="padding: 16px; text-align: center;">
+        Showing changes for this commit (Files coming soon).
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .commit-details-container {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-main);
+    overflow: hidden;
+  }
+  
+  .commit-details-header {
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .commit-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .commit-body {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+    font-family: inherit;
+  }
+
+  .commit-metadata-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 16px;
+  }
+
+  .commit-author-info {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .author-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .author-name:hover { color: var(--accent-color); text-decoration: underline; }
+
+  .commit-shas-info {
+    font-size: 0.85rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .sha-label { color: var(--text-secondary); }
+  .sha-value { font-family: monospace; color: var(--text-primary); }
+
+  .commit-parents-info {
+    padding: 8px 16px;
+    background: var(--bg-main);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .parent-sha-link {
+    font-family: monospace;
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+  .parent-sha-link:hover { text-decoration: underline; }
+
+  .separator-dot { opacity: 0.5; }
+</style>

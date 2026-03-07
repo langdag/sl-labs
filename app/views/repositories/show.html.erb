@@ -26,12 +26,14 @@
       <% if @latest_commit %>
         <div class="latest-commit-banner">
           <div class="commit-author">
-            <strong><%= @latest_commit[:author] %></strong>
-            <span class="commit-message"><%= @latest_commit[:message] %></span>
+            <strong><%= link_to @latest_commit[:author], repository_commits_path(username: @repository.user.username, repository_name: @repository.name, author: @latest_commit[:author]), class: "author-link" %></strong>
+            <span class="commit-message">
+              <%= link_to @latest_commit[:message], repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: @latest_commit[:sha]), class: "commit-link" %>
+            </span>
           </div>
           <div class="commit-meta">
             <span class="commit-time"><%= time_ago_in_words(@latest_commit[:committed_date]) %> ago</span>
-            <span class="commit-sha"><%= @latest_commit[:sha][0..7] %></span>
+            <%= link_to @latest_commit[:sha][0..7], repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: @latest_commit[:sha]), class: "commit-sha" %>
           </div>
         </div>
       <% end %>
@@ -138,7 +140,16 @@ git push -u origin main</pre>
 
   .file-age { font-size: 0.85rem; color: var(--text-secondary); width: 120px; text-align: right; flex-shrink: 0; }
 
+  .file-age { font-size: 0.85rem; color: var(--text-secondary); width: 120px; text-align: right; flex-shrink: 0; }
+
   .empty-repo { border: 1px solid var(--border-color); border-radius: 6px; padding: 2rem; background: var(--bg-secondary); text-align: center; }
   .empty-repo h3 { margin-top: 0; color: var(--text-primary); }
   .setup-commands pre { background: var(--bg-main); padding: 1.5rem; border-radius: 6px; border: 1px solid var(--border-color); overflow-x: auto; text-align: left; color: #e6edf3; font-size: 0.9rem; }
+
+  .author-link { color: var(--text-primary); text-decoration: none; }
+  .author-link:hover { color: var(--accent-color); text-decoration: underline; }
+  .commit-link { color: var(--text-primary); text-decoration: none; }
+  .commit-link:hover { color: var(--accent-color); text-decoration: underline; }
+  .commit-sha { color: var(--text-secondary); text-decoration: none; font-family: monospace; background: rgba(139, 148, 158, 0.1); padding: 2px 6px; border-radius: 4px; }
+  .commit-sha:hover { color: var(--accent-color); text-decoration: underline; background: rgba(88, 166, 255, 0.1); }
 </style>

@@ -11,31 +11,22 @@ class TreeNavigationService < BaseService
 
   def call
     # 1. Resolve Ref via gRPC
-    sha = GitServiceClient.resolve_ref(@repo, @ref)
-
-    # Fallback logic for HEAD -> main/master
-    if sha.nil? && @ref == "HEAD"
-      ["master", "main"].each do |fallback|
-        sha = GitServiceClient.resolve_ref(@repo, fallback)
-        if sha
-          @resolved_ref = fallback
-          break
-        end
-      end
-    end
+    sha, @resolved_ref = GitServiceClient.resolve_ref_with_fallback(@repo, @ref)
 
     return nil unless sha
 
     # 2. Get the commit object via gRPC
     # Note: We assume the resolved ref points to a commit for now
-    commit_response = GitServiceClient.get_commit(@repo, sha)
-    return nil unless commit_response
+    commit_response = GitServiceClient.get_commits(@repo, sha)
+    return nil unless commit_response && commit_response.entries.any?
 
-    @commit = Helper.format_commit(commit_response)
+    # For navigation, we usually care about the "current" commit (first in history)
+    @commit = Helper.format_commit(commit_response.entries.first)
+    @commits = commit_response.entries # Store full history if needed
 
     # 3. Start traversal from the commit's tree
-    # The commit response gives us the tree_sha
-    root_tree_sha = commit_response.tree_sha
+    # The first entry in the response is the specific commit we requested
+    root_tree_sha = commit_response.entries.first.tree_sha
 
     traverse(root_tree_sha, @path)
   end

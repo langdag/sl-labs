@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../sl-protos"
+		},
+		{
+			"path": "../../../sl-git-service"
+		},
+		{
+			"path": "../../../git_object_store"
+		}
+	],
+	"settings": {}
+}

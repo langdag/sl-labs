@@ -14,13 +14,30 @@ class GitServiceClient
       nil
     end
 
-    def get_commit(repository, sha)
+    def resolve_ref_with_fallback(repository, ref)
+      sha = resolve_ref(repository, ref)
+      resolved_ref = ref
+
+      if sha.blank? && ref == "HEAD"
+        ["master", "main"].each do |fallback|
+          sha = resolve_ref(repository, fallback)
+          if sha.present?
+            resolved_ref = fallback
+            break
+          end
+        end
+      end
+
+      [sha, resolved_ref]
+    end
+
+    def get_commits(repository, sha)
       request = Sl::Git::GetCommitRequest.new(
         repository_id: repository.id.to_s,
         repository_name: repository.name,
         sha: sha
       )
-      stub.get_commit(request)
+      stub.get_commits(request)
     rescue GRPC::NotFound
       nil
     end
