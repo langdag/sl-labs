@@ -42,11 +42,13 @@ class GitServiceClient
       nil
     end
 
-    def get_tree(repository, sha)
+    def get_tree(repository, sha, path = nil, commit_sha = nil)
       request = Sl::Git::GetTreeRequest.new(
         repository_id: repository.id.to_s,
         repository_name: repository.name,
-        sha: sha
+        sha: sha,
+        path: path,
+        commit_sha: commit_sha
       )
       stub.get_tree(request)
     rescue GRPC::NotFound

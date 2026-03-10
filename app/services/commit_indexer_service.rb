@@ -23,8 +23,8 @@ class CommitIndexerService
       next if indexed_shas.include?(current_sha) || Commit.exists?(repository: @repository, sha: current_sha)
 
       begin
-        git_commit = GitObjectStore::GitObject.find(@git_repo, current_sha)
-        next unless git_commit.is_a?(GitObjectStore::Commit)
+        git_commit = ::GitObjectStore::GitObject.find(@git_repo, current_sha)
+        next unless git_commit.is_a?(::GitObjectStore::Commit)
 
         create_commit_record(git_commit)
         indexed_shas.add(current_sha)

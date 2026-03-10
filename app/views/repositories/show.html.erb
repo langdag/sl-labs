@@ -53,11 +53,13 @@
               </span>
               
               <span class="file-commit-message">
-                <%= @latest_commit ? @latest_commit[:message] : "" %>
+                <%= entry.last_commit&.message.presence || "" %>
               </span>
 
               <span class="file-age">
-                <%= @latest_commit ? time_ago_in_words(@latest_commit[:committed_date]) : "" %>
+                <% if entry.last_commit&.sha.present? %>
+                  <%= link_to entry.last_commit.sha[0..7], repository_commit_path(username: @repository.user.username, repository_name: @repository.name, sha: entry.last_commit.sha), class: "commit-sha" %>
+                <% end %>
               </span>
             </div>
           <% end %>
