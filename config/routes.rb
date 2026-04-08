@@ -32,4 +32,6 @@ Rails.application.routes.draw do
   get "/:username/:repository_name", to: "repositories#show", as: :repository_pretty_root
 
   get "/:username", to: "profiles#show", as: :user_profile
+
+  post "/api/internal/webhooks/push", to: "webhooks#push"
 end
