@@ -43,12 +43,12 @@
           <% @entries.each do |entry| %>
             <div class="file-row">
               <span class="file-name">
-                <% full_path = @path.present? ? "#{@path}/#{entry.name}" : entry.name %>
+                <% full_path = entry.name %>
                  <span class="icon"><%= entry.mode == "40000" ? "📁" : "📄" %></span>
                 <% if entry.mode == "40000" %>
-                  <%= link_to entry.name, repository_tree_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
+                  <%= link_to File.basename(entry.name), repository_tree_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
                 <% else %>
-                  <%= link_to entry.name, repository_blob_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
+                  <%= link_to File.basename(entry.name), repository_blob_path(username: @repository.user.username, repository_name: @repository.name, ref: @ref, path: full_path) %>
                 <% end %>
               </span>
               

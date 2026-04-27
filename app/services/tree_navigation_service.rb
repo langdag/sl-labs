@@ -21,7 +21,7 @@ class TreeNavigationService < BaseService
     return nil unless commit_response && commit_response.entries.any?
 
     @commits = commit_response.entries # Store full history if needed
-    
+
     # 3. Format the current commit for the main header banner
     @commit = format_single_commit(commit_response.entries.first)
 
@@ -44,11 +44,11 @@ class TreeNavigationService < BaseService
     path_string.split("/").reject(&:blank?).reduce(fetch_tree(current_sha, "", @commit_sha)) do |current_object, segment|
       return nil unless current_object.is_a?(::Sl::Git::GetTreeResponse)
 
-      entry = current_object.entries.find { |e| e.name == segment }
+      entry = current_object.entries.find { |e| File.basename(e.name) == segment }
       return nil unless entry
 
       if entry.mode == "40000" # Directory
-        fetch_tree(entry.sha, segment, @commit_sha)
+        fetch_tree(entry.sha, entry.name, @commit_sha)
       else # File / Blob
         # We need to return a GetBlobResponse-like object so the controller recognizes it.
         # Ideally, we'd fetch the blob here or in the controller.
